@@ -26,7 +26,8 @@ const Register = () => {
   })
 
   useEffect(() => {
-    if(localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string)){
+    const user = localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string)
+    if(user!== null){
       navigate('/')
     }
   }, [])

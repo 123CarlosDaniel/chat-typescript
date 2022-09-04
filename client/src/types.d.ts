@@ -1,13 +1,16 @@
+import { MutableRefObject } from 'react';
+import { Socket } from 'socket.io-client';
 export interface Data {
   status : boolean
   user : object
   msg: string
 }
 
-export interface Contact {
+export type Contact = {
   _id: string
   avatarImage: MediaImage
   username: string
+  isAvatarImageSet : boolean
 }
 export interface ContactsIf {
   contacts: Array<Contact>
@@ -16,5 +19,5 @@ export interface ContactsIf {
 
 export interface ChatContainerIf {
   currentChat : Contact
-  socket : any
+  socket : MutableRefObject<Socket>
 }

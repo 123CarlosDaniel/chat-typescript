@@ -2,18 +2,19 @@ import { useNavigate } from "react-router-dom";
 import { BiPowerOff } from "react-icons/bi"
 import styled from "styled-components";
 import { logoutRoute } from "../utils/ApiRoutes";
+import { Socket } from "socket.io-client";
+import { MutableRefObject } from "react";
 
-
-const Logout = () => {
+const Logout = ({socket} : {socket : MutableRefObject<Socket>} ) => {
   const navigate = useNavigate()
 
   const handleClick = async () => {
-    const id = await JSON.parse(
-      localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) as string
-    )._id
-
+    const user = localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) 
+    if (user === null) return 
+    const id = await JSON.parse(user)._id
     const response = await fetch(`${logoutRoute}/${id}`)
     if ( response.status === 200) {
+      socket.current.emit('discon')
       localStorage.clear()
       navigate("/login")
     }

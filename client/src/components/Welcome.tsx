@@ -4,8 +4,11 @@ import Robot from "../assets/robot.gif";
 export const  Welcome =() => {
   const [userName, setUserName] = useState("");
   useEffect( () => {
+    //getting username from localStorage
     const getData = async() => {
-      const user = await JSON.parse( localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) as string).username
+      const data = localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string)
+      if (data === null) return
+      const user = await JSON.parse(data).username
       setUserName(user)
     }
     getData()

@@ -6,20 +6,24 @@ import { sendMessageRoute, recieveMessageRoute } from "../utils/ApiRoutes";
 import {  useEffect, useRef, useState } from "react";
 import { ChatContainerIf } from "../types";
 
-interface Message {
+type Message = {
   fromSelf : boolean
   message : string
 }
+
+const userLocalStorage = import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string
+
 const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
   const [messages, setMessages] = useState<Message[]> ([])
   const [arrivalMessage, setArrivalMessage] = useState<Message | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const getResponse =async () => {
-      const data = await JSON.parse(
-        localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) as string
-      )
+    //getting messages from the api
+    const getMessages =async () => {
+      const user = localStorage.getItem(userLocalStorage)
+      if ( user === null) return
+      const data = await JSON.parse(user)
       const response = await fetch(recieveMessageRoute, {
         method: "POST",
         headers: {'Content-type':'application/json'},
@@ -31,27 +35,17 @@ const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
       const resolver = await response.json()
       setMessages(resolver)
     }
-    getResponse()
-  },[currentChat])
-
-  useEffect(() => {
-    const getCurrentChat = async() => {
-      if (currentChat){
-        await JSON.parse(
-          localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) as string
-        )._id
-      }
-    }
-    getCurrentChat()
+    getMessages()
   },[currentChat])
 
   const handleSendMsg = async (msg: string) => {
+    //  emit the event to the backend
+    // save the message in the api
     const data = await JSON.parse(
-      localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) as string
+      localStorage.getItem(userLocalStorage) as string
     )
     socket.current.emit("send-msg", {
       to: currentChat._id,
-      from: data._id,
       msg
     })
     await fetch(sendMessageRoute,{
@@ -67,6 +61,8 @@ const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
   }
 
   useEffect( () => {
+    // accept the event from the backend
+    // setting the state of arrivalMessage
     if (socket.current) {
       socket.current.on("msg-recieve", (msg: string) => {
         setArrivalMessage({ fromSelf:false,message:msg})
@@ -75,12 +71,14 @@ const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
   },[])
 
   useEffect(()=>{
+    // setting new messages  
     arrivalMessage && setMessages( (prev)=> [...prev,arrivalMessage])
   },[arrivalMessage])
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth"})
   },[messages])
+
   return (
     <Container>
       <div className="chat-header">
@@ -95,7 +93,7 @@ const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
             <h3>{currentChat.username}</h3>
           </div>
         </div>
-        <Logout />
+        <Logout socket={socket}/>
       </div>
       <div className="chat-messages">
         {messages.map((message) => {

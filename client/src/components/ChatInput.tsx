@@ -11,7 +11,6 @@ interface handleSendMsg {
 const ChatInput = ({ handleSendMsg} : handleSendMsg) => {
 
   const [msg, setMsg] = useState("")
-
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
 
   const handleEmojiPickerhideShow = () => {

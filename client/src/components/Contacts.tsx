@@ -10,11 +10,10 @@ export const Contacts = ({ contacts, changeChat }: ContactsIf) => {
   const [currentSelected, setCurrentSelected] = useState<number>()
   useEffect(() => {
     const setData = async () => {
-      const data = await JSON.parse(
-        localStorage.getItem(
-          import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string
-        ) as string
-      )
+      //setting username and avatarimage from localStorage
+      const userData =  localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) 
+      if (userData === null) return
+      const data = await JSON.parse(userData)
       setCurrentUserName(data.username)
       setCurrentUserImage(data.avatarImage)
     }
@@ -26,7 +25,7 @@ export const Contacts = ({ contacts, changeChat }: ContactsIf) => {
   }
   return (
     <>
-      {currentUserImage && currentUserImage && (
+      {currentUserImage && (
         <Container>
           <div className="brand">
             <img src={Logo} alt="logo" />

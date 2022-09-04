@@ -6,7 +6,9 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useNavigate } from 'react-router-dom'
 import { setAvatarRoute } from '../utils/ApiRoutes'
 import { useEffect, useState } from 'react'
+import { Contact } from '../types'
 
+const VITE_REACT_APP_KEY = import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string
 export const SetAvatar = () => {
   const api = `https://api.multiavatar.com/4645646`
   const navigate = useNavigate()
@@ -18,15 +20,14 @@ export const SetAvatar = () => {
   const toastOptions: ToastOptions = {
     position: 'bottom-right',
     autoClose: 8000,
-    pauseOnHover: true,
+    pauseOnHover: false,
     draggable: true,
     theme: 'dark',
   }
   useEffect(() => {
-    if (
-      !localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string)
-    )
-      navigate('/login')
+    //verify if you are logged
+    const user = localStorage.getItem(VITE_REACT_APP_KEY)
+    if ( user === null ) navigate('/login')
   }, [])
 
   const setProfilePicture = async () => {
@@ -34,10 +35,8 @@ export const SetAvatar = () => {
       toast.error('Please select an avatar', toastOptions)
       return
     } 
-    const user = await JSON.parse(
-      localStorage.getItem(
-        import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string
-      ) as string
+    const user : Contact = await JSON.parse(
+      localStorage.getItem(VITE_REACT_APP_KEY) as string
     )
     const response = await fetch(`${setAvatarRoute}/${user._id}`, {
       method: 'POST',
@@ -51,7 +50,7 @@ export const SetAvatar = () => {
       user.isAvatarImageSet = true
       user.avatarImage = data.image
       localStorage.setItem(
-        import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string,
+        VITE_REACT_APP_KEY,
         JSON.stringify(user)
       )
       navigate('/')
@@ -61,16 +60,13 @@ export const SetAvatar = () => {
   }
 
   useEffect(() => {
+    //getting random avatars
     const getData = async () => {
       try {
         let data: string[] = []
-        let urlArr :string[] = []
         for (let i = 0; i < 4; i++) {
           const url = `${api}/${Math.round(Math.random() * 1000)}`
-          urlArr.push(url)
-          const response = await fetch(
-            url
-          )
+          const response = await fetch(url)
           const image = await response.arrayBuffer()
           const buffer = Buffer.from(image)
           const res = buffer.toString("base64")

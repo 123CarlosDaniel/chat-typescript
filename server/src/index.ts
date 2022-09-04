@@ -15,17 +15,19 @@ const io = new SocketServer(server, {
 })
 
 global.onlineUsers = new Map()
-
-io.on('connection', (socket) => {
-  global.chatSocket = socket
-  // const count = io.engine.clientsCount
-  // console.log(count)
+io.on('connection',async (socket) => {
+  const count = io.engine.clientsCount
+  console.log({count})
+  socket.on('discon', () => {
+    socket.disconnect(true)
+  })
+  // global.chatSocket = socket
   socket.on('add-user', (userId) => {
     onlineUsers.set(userId,socket.id)
   })
 
   socket.on("send-msg", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to)
+    const sendUserSocket = onlineUsers.get(data.to) //socket.id
     if (sendUserSocket){
       socket.to(sendUserSocket).emit("msg-recieve", data.msg)
     }
