@@ -3,14 +3,14 @@ import { useNavigate, Link } from 'react-router-dom'
 import Logo from '../assets/logo.svg'
 import { ToastContainer, toast, ToastOptions } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react'
 import { registerRoute } from '../utils/ApiRoutes'
 import { Data } from '../types'
+import { getUserFromLS, setUserInLS } from '../utils/LocalStorage'
 
 
 const Register = () => {
   const navigate = useNavigate()
-
   const toastOptions : ToastOptions= {
     position: "bottom-right",
     autoClose: 8000,
@@ -26,13 +26,13 @@ const Register = () => {
   })
 
   useEffect(() => {
-    const user = localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string)
+    const user = getUserFromLS()
     if(user!== null){
       navigate('/')
     }
   }, [])
 
-  const handleChange = (e : ChangeEvent<HTMLInputElement>) => {
+  const handleChange:ChangeEventHandler<HTMLInputElement> = (e) => {
     setValues({ ...values, [e.target.name] : e.target.value })
   } 
 
@@ -67,7 +67,7 @@ const Register = () => {
     return true
   }
   
-  const handleSubmit = async(e : FormEvent<HTMLFormElement>) => {
+  const handleSubmit:FormEventHandler<HTMLFormElement> = async(e) => {
     e.preventDefault()
     if (handleValidation()){
       const { email, username, password } = values
@@ -84,23 +84,21 @@ const Register = () => {
         toast.error(response.statusText, toastOptions)
       }
       const data : Data = await response.json()
+      console.log(data)
       if (data.status === false) {
         toast.error(data.msg, toastOptions)
+        return
       }
-      if (data.status === true) {
-        localStorage.setItem(
-          import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string,
-          JSON.stringify(data.user)
-        )
-        navigate('/')
-      }
+      setUserInLS(data.user)
+      navigate('/')
+      
     }
   }
 
   return (
     <>
       <FormContainer>
-        <form onSubmit={(event) => handleSubmit(event)}>
+        <form onSubmit={handleSubmit}>
           <div className='brand'>
             <img src={Logo} alt="logo" />
             <h1>snappy</h1>
@@ -109,25 +107,25 @@ const Register = () => {
            type="text" 
            placeholder='Username'
            name='username'
-           onChange={(e)=> handleChange(e)}
+           onChange={handleChange}
            />
           <input
            type="email" 
            placeholder='Email'
            name='email'
-           onChange={(e)=> handleChange(e)}
+           onChange={handleChange}
            />
           <input
            type="password" 
            placeholder='Password'
            name='password'
-           onChange={(e)=> handleChange(e)}
+           onChange={handleChange}
            />
           <input
            type="password" 
            placeholder='Confirm Password'
            name='confirmPassword'
-           onChange={(e)=> handleChange(e)}
+           onChange={handleChange}
            />
            <button type='submit'>Create User</button>
            <span>Already have an account? <Link to={"/login"}>Login</Link></span>

@@ -98,6 +98,7 @@ export const SetAvatar = () => {
                   className={`avatar ${
                     selectedAvatar === index ? 'selected' : ''
                   }`}
+                  key={index}
                 >
                   <img
                     src={`data:image/svg+xml;base64,${avatar}`}

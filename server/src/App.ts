@@ -5,7 +5,7 @@ import auth from './routes/auth.routes'
 import message from './routes/message.routes'
 import './db'
 const app = express()
-
+ 
 
 //configurations
 app.set('port', process.env.PORT || 3000)

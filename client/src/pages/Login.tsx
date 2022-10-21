@@ -4,8 +4,9 @@ import styled from "styled-components"
 import { ToastContainer, toast, ToastOptions } from "react-toastify"
 import { loginRoute } from "../utils/ApiRoutes"
 import "react-toastify/dist/ReactToastify.css"
-import { ChangeEvent, FormEvent, useEffect, useState } from "react"
+import { ChangeEventHandler, FormEventHandler, useEffect, useState } from "react"
 import { Data } from "../types"
+import { getUserFromLS, setUserInLS } from "../utils/LocalStorage"
 
 const Login = () => {
   const navigate = useNavigate()
@@ -18,13 +19,13 @@ const Login = () => {
     theme: "dark",
   }
   useEffect(() => {
-    const user = localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY )
+    const user = getUserFromLS()
     if (user !== null){
       navigate('/')
     }
   }, [])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange:ChangeEventHandler<HTMLInputElement> = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value})
   }
 
@@ -37,7 +38,7 @@ const Login = () => {
     return true
   }
 
-  const handleSubmit = async (e : FormEvent<HTMLFormElement>) => {
+  const handleSubmit:FormEventHandler<HTMLFormElement> = async (e ) => {
     e.preventDefault()
     if (validateForm()) {
       const { username, password } = values
@@ -57,10 +58,7 @@ const Login = () => {
         toast.error(data.msg, toastOptions)
       } 
       if (data.status === true) {
-        localStorage.setItem(
-          import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string,
-          JSON.stringify(data.user)
-        )
+        setUserInLS(data.user)
         navigate("/")
       }
     }
@@ -68,7 +66,7 @@ const Login = () => {
   return (
     <>
       <FormContainer>
-        <form onSubmit={(event) => handleSubmit(event)}>
+        <form onSubmit={handleSubmit}>
           <div className='brand'>
             <img src={Logo} alt="logo" />
             <h1>snappy</h1>
@@ -77,18 +75,19 @@ const Login = () => {
            type="text" 
            placeholder='Username'
            name='username'
-           onChange={(e)=> handleChange(e)}
+           onChange={handleChange}
            min="3"
            />
           <input
            type="password" 
            placeholder='Password'
            name='password'
-           onChange={(e)=> handleChange(e)}
+           onChange={handleChange}
            />
            <button type='submit'>Log In</button>
            <span>Don't have an account? <Link to={"/register"}>Create One</Link></span>
         </form>
+        <div className="textHelper">To start using please login with these credentials<br />Username: pepe <br /> Password: 123456789</div>
       </FormContainer>
       <ToastContainer/>
     </>
@@ -103,6 +102,9 @@ const FormContainer = styled.div`
   gap: 1rem;
   align-items: center;
   background-color: #131324;
+  .textHelper{
+    color: white;
+  }
   .brand {
     display: flex;
     align-items: center;
@@ -122,7 +124,7 @@ const FormContainer = styled.div`
     gap: 2rem;
     background-color: #00000076;
     border-radius: 2rem;
-    padding: 5rem;
+    padding: 2rem;
   }
   input {
     background-color: transparent;

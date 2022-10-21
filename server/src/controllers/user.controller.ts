@@ -43,7 +43,7 @@ export const register = async (
     })
     return res.json({
       status: true,
-      user: { email: user.email, username: user.username },
+      user,
     })
   } catch (error) {
     next(error)
@@ -72,7 +72,7 @@ export const setAvatar = async (
   try {
     const userId = req.params.id
     const avatarImage = req.body.image
-    console.log(avatarImage)
+    // console.log(avatarImage)
     const userData = await userModel.findByIdAndUpdate(
       userId,
       { isAvatarImageSet: true, avatarImage },

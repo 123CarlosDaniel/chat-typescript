@@ -5,6 +5,7 @@ import { v4 as uuid} from 'uuid'
 import { sendMessageRoute, recieveMessageRoute } from "../utils/ApiRoutes";
 import {  useEffect, useRef, useState } from "react";
 import { ChatContainerIf } from "../types";
+import { getUserFromLS } from "../utils/LocalStorage";
 
 type Message = {
   fromSelf : boolean
@@ -21,9 +22,9 @@ const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
   useEffect(() => {
     //getting messages from the api
     const getMessages =async () => {
-      const user = localStorage.getItem(userLocalStorage)
+      const user = getUserFromLS()
       if ( user === null) return
-      const data = await JSON.parse(user)
+      const data = JSON.parse(user)
       const response = await fetch(recieveMessageRoute, {
         method: "POST",
         headers: {'Content-type':'application/json'},
@@ -41,10 +42,10 @@ const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
   const handleSendMsg = async (msg: string) => {
     //  emit the event to the backend
     // save the message in the api
-    const data = await JSON.parse(
-      localStorage.getItem(userLocalStorage) as string
+    const data = JSON.parse(
+      getUserFromLS()!
     )
-    socket.current.emit("send-msg", {
+    socket.current!.emit("send-msg", {
       to: currentChat._id,
       msg
     })

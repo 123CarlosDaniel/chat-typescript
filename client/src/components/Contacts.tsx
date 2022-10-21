@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Logo from '../assets/logo.svg'
 import { Contact, ContactsIf } from '../types'
+import { getUserFromLS } from '../utils/LocalStorage'
 
 
 export const Contacts = ({ contacts, changeChat }: ContactsIf) => {
@@ -11,9 +12,9 @@ export const Contacts = ({ contacts, changeChat }: ContactsIf) => {
   useEffect(() => {
     const setData = async () => {
       //setting username and avatarimage from localStorage
-      const userData =  localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string) 
+      const userData =  getUserFromLS()
       if (userData === null) return
-      const data = await JSON.parse(userData)
+      const data = JSON.parse(userData)
       setCurrentUserName(data.username)
       setCurrentUserImage(data.avatarImage)
     }

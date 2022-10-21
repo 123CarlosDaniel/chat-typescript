@@ -1,5 +1,5 @@
 import Picker, { IEmojiData } from "emoji-picker-react";
-import { FormEvent, useState } from "react";
+import { FormEventHandler, useState } from "react";
 import {BsEmojiSmileFill} from "react-icons/bs"
 import {IoMdSend} from "react-icons/io"
 import styled from "styled-components";
@@ -23,7 +23,7 @@ const ChatInput = ({ handleSendMsg} : handleSendMsg) => {
     setMsg(message)
   }
 
-  const sendChat = (e: FormEvent<HTMLFormElement>) => {
+  const sendChat:FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     if (msg.length> 0) {
       handleSendMsg(msg)

@@ -1,6 +1,5 @@
-import { config } from 'dotenv'
+import 'dotenv/config'
 import pkg from 'mongoose'
-config()
 const { connect } = pkg
 const url = process.env.MONGO_URL
 connect(url as string)

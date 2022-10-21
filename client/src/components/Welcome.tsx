@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Robot from "../assets/robot.gif";
+import { getUserFromLS } from "../utils/LocalStorage";
 export const  Welcome =() => {
   const [userName, setUserName] = useState("");
   useEffect( () => {
     //getting username from localStorage
     const getData = async() => {
-      const data = localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string)
+      const data = getUserFromLS()
       if (data === null) return
-      const user = await JSON.parse(data).username
+      const user = JSON.parse(data).username
       setUserName(user)
     }
     getData()

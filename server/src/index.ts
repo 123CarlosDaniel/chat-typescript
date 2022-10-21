@@ -1,5 +1,6 @@
 import app from "./App";
 import { Server as SocketServer } from 'socket.io'
+import 'dotenv/config'
 
 const port = app.get('port')
 
@@ -9,11 +10,10 @@ console.log('server running on port ',port)
 
 const io = new SocketServer(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     credentials: true
   }
 })
-
 global.onlineUsers = new Map()
 io.on('connection',async (socket) => {
   const count = io.engine.clientsCount
@@ -31,5 +31,9 @@ io.on('connection',async (socket) => {
     if (sendUserSocket){
       socket.to(sendUserSocket).emit("msg-recieve", data.msg)
     }
+  })
+  socket.on('disconnect', ()=>{
+    const count = io.engine.clientsCount
+    console.log({count},'disconnect')
   })
 })

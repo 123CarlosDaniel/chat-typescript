@@ -7,6 +7,7 @@ import { Contacts } from '../components/Contacts'
 import { Welcome } from '../components/Welcome'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { Contact } from '../types'
+import { getUserFromLS } from '../utils/LocalStorage'
 
 const Chat = () => {
   const navigate = useNavigate()
@@ -21,12 +22,12 @@ const Chat = () => {
   useEffect(() => {
     const getUser = async () => {
       //getting user from localStorage
-      const userObject = localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string)
+      const userObject = getUserFromLS()
       if (userObject === null) {
         navigate('/login')
         return
       }
-      const user = await JSON.parse(userObject)
+      const user = JSON.parse(userObject)
       setCurrentUser(user)
     }
     getUser()
