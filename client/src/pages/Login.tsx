@@ -7,10 +7,12 @@ import "react-toastify/dist/ReactToastify.css"
 import { ChangeEventHandler, FormEventHandler, useEffect, useState } from "react"
 import { Data } from "../types"
 import { getUserFromLS, setUserInLS } from "../utils/LocalStorage"
+import Loader from "../components/Loader"
 
 const Login = () => {
   const navigate = useNavigate()
   const [values, setValues] = useState({ username: "", password:""})
+  const [loading, setLoading] = useState(false)
   const toastOptions: ToastOptions = {
     position: "bottom-right",
     autoClose: 8000,
@@ -40,6 +42,7 @@ const Login = () => {
 
   const handleSubmit:FormEventHandler<HTMLFormElement> = async (e ) => {
     e.preventDefault()
+    setLoading(true)
     if (validateForm()) {
       const { username, password } = values
       const response = await fetch(loginRoute, {
@@ -54,6 +57,7 @@ const Login = () => {
         toast.error(response.statusText, toastOptions)
       }
       const data: Data = await response.json()
+      setLoading(false)
       if ( data.status === false) {
         toast.error(data.msg, toastOptions)
       } 
@@ -87,14 +91,15 @@ const Login = () => {
            <button type='submit'>Log In</button>
            <span>Don't have an account? <Link to={"/register"}>Create One</Link></span>
         </form>
-        <div className="textHelper">To start using please login with these credentials<br />Username: pepe <br /> Password: 123456789</div>
+        <div className="textHelper">To start using please login with these credentials<br /><br />Username: admin <br /> Password: 123456789</div>
+        {loading && <Loader/>}
       </FormContainer>
       <ToastContainer/>
     </>
   )
 }
 const FormContainer = styled.div`
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;

@@ -7,9 +7,11 @@ import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react
 import { registerRoute } from '../utils/ApiRoutes'
 import { Data } from '../types'
 import { getUserFromLS, setUserInLS } from '../utils/LocalStorage'
+import Loader from '../components/Loader'
 
 
 const Register = () => {
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const toastOptions : ToastOptions= {
     position: "bottom-right",
@@ -69,6 +71,7 @@ const Register = () => {
   
   const handleSubmit:FormEventHandler<HTMLFormElement> = async(e) => {
     e.preventDefault()
+    setLoading(true)
     if (handleValidation()){
       const { email, username, password } = values
       const response = await fetch(registerRoute, {
@@ -84,7 +87,7 @@ const Register = () => {
         toast.error(response.statusText, toastOptions)
       }
       const data : Data = await response.json()
-      console.log(data)
+      setLoading(false)
       if (data.status === false) {
         toast.error(data.msg, toastOptions)
         return
@@ -130,6 +133,7 @@ const Register = () => {
            <button type='submit'>Create User</button>
            <span>Already have an account? <Link to={"/login"}>Login</Link></span>
         </form>
+        {loading && <Loader/>}
       </FormContainer>
       <ToastContainer/>
     </>

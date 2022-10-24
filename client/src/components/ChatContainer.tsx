@@ -12,8 +12,6 @@ type Message = {
   message : string
 }
 
-const userLocalStorage = import.meta.env.VITE_REACT_APP_LOCALHOST_KEY as string
-
 const ChatContainer = ({ currentChat , socket} : ChatContainerIf) => {
   const [messages, setMessages] = useState<Message[]> ([])
   const [arrivalMessage, setArrivalMessage] = useState<Message | null>(null)
